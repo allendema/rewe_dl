@@ -1,0 +1,2 @@
+httpx
+# apprise is options - used for notifications

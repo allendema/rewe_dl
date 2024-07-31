@@ -1,0 +1,20 @@
+{
+    "matrix": {
+        "homeserver": "https://matrix.org",
+        "access_token": "YOUR_TOKEN_GOES_HERE",
+        "device_name": "Python script",
+        "room_id": "!YOUR_ROOM_ID:example.org"
+    },
+    "telegram": {
+        "token": "YOUR_TOKEN_GOES_HERE",
+        "chat_id": "ID_GOES_HERE"
+    },
+    "cookiesB": {"marketsCookie": {
+        "online": {"wwIdent":"1940419","marketZipCode":"56073","serviceTypes":["PICKUP"],"customerZipCode":"56073"},
+        "stationary": {"wwIdent":"1763154","marketZipCode":"56179","serviceTypes":["STATIONARY"]}}
+    },
+    "cookies": {
+        "marketsCookie": "%7B%22online%22%3A%7B%22wwIdent%22%3A%221940419%22%2C%22marketZipCode%22%3A%2256073%22%2C%22serviceTypes%22%3A%5B%22PICKUP%22%5D%2C%22customerZipCode%22%3A%2256073%22%7D%2C%22stationary%22%3A%7B%22wwIdent%22%3A%221763154%22%2C%22marketZipCode%22%3A%2256179%22%2C%22serviceTypes%22%3A%5B%22STATIONARY%22%5D%7D%7D",
+        "websitebot-launch": "human-mousemove"
+    }
+}
