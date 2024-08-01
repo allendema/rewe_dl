@@ -21,7 +21,9 @@ log = logging.getLogger(__name__)
 
 
 def main():
-    discounted_products = STORE().get_discounted_products()
+    my_store = STORE(store_id="8534540")
+
+    discounted_products = my_store.get_discounted_products()
 
     all_products = Parser().parse_search_results_products(discounted_products)
 

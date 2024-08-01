@@ -3,7 +3,7 @@
 
 ### Custom ###
 # Ignore the entire "data/" directory
-data/
+# data/
 # Allow specific files within the "data/" directory
 !data/my_basket.sqlite3
 !data/rewe-dl-jsonpp-*.json

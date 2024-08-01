@@ -9,21 +9,13 @@ import json
 import locale
 import logging
 from random import choice
-from functools import partial
-
-import httpx
-
-log = logging.getLogger(__name__)
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(PROJECT_DIR)
 
 import exception
 
-global YELLOW
-global RED
-YELLOW = "\033[1;32;40m"
-RED = "\033[31m"
+log = logging.getLogger(__name__)
 
 
 def create_agents() -> dict:
@@ -69,7 +61,7 @@ def save_to_json(json_data: dict, file_name: str, indent=4, mode="w") -> None:
             else:
                 raise ValueError("json_data must be a dict or a list of dicts!")
         except (IOError, OSError) as e:
-            return str(e)
+            log.error(str(e))
 
 
 def save_to_jsonl(json_data: dict, file_name: str) -> None:
@@ -91,78 +83,7 @@ def save_to_jsonl(json_data: dict, file_name: str) -> None:
         raise ValueError("json_data must be a dict or a list of dicts!")
 
 
-def _htmlentity_transform(entity_with_semicolon):
-    """Transforms an HTML entity to a character."""
-    # mod from yt-dlp
-    import html
-    import contextlib
-
-    entity = entity_with_semicolon[:-1]
-
-    # Known non-numeric HTML entity
-    if entity in html.entities.name2codepoint:
-        return chr(html.entities.name2codepoint[entity])
-
-    # TODO: HTML5 allows entities without a semicolon.
-    # E.g. '&Eacuteric' should be decoded as 'Éric'.
-    if entity_with_semicolon in html.entities.html5:
-        return html.entities.html5[entity_with_semicolon]
-
-    mobj = re.match(r"#(x[0-9a-fA-F]+|[0-9]+)", entity)
-    if mobj is not None:
-        numstr = mobj.group(1)
-        if numstr.startswith("x"):
-            base = 16
-            numstr = "0%s" % numstr
-        else:
-            base = 10
-        # See https://github.com/ytdl-org/youtube-dl/issues/7518
-        with contextlib.suppress(ValueError):
-            return chr(int(numstr, base))
-
-    # Unknown entity in name, return its literal representation
-    return "&%s;" % entity
-
-
-def unescapeHTML(s):
-    """https://github.com/ytdl-patched/ytdl-patched/blob/8522226d2fea04d48802a9ef402438ff79227fe4/yt_dlp/utils.py#L826"""
-    if s is None:
-        return None
-    assert isinstance(s, str)
-
-    return re.sub(r"&([^&;]+;)", lambda m: _htmlentity_transform(m.group(1)), s)
-
-
-def clean_html(html):
-    """Clean an HTML snippet into a readable string"""
-    import re
-
-    # mod from https://github.com/ytdl-patched/ytdl-patched/blob/8522226d2fea04d48802a9ef402438ff79227fe4/yt_dlp/utils.py#L580
-    if html is None or not isinstance(html, str):  # Convenience for sanitizing descriptions etc.
-        return html
-
-    html = re.sub(r"\s+", " ", html)
-    html = re.sub(r"(?u)\s?<\s?br\s?/?\s?>\s?", "\n", html)
-    html = re.sub(r"(?u)<\s?/\s?p\s?>\s?<\s?p[^>]*>", "\n", html)
-    # Strip html tags
-    html = re.sub("<.*?>", "", html)
-    # Replace html entities
-    html = unescapeHTML(html)
-    return html.strip()
-
-
-def escapeHTML(text):
-    # from https://github.com/ytdl-patched/ytdl-patched/blob/8522226d2fea04d48802a9ef402438ff79227fe4/yt_dlp/utils.py#L835
-    return (
-        text.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-        .replace("'", "&#39;")
-    )
-
-
-def read_file(file_name: str):
+def read_file(file_name: str) -> list:
     with open(file_name) as file:
         data = file.readlines()
         file.close()
@@ -187,9 +108,10 @@ def append_to_file(content, file_name: str) -> None:
 
 
 def slugify(value):
-    """# https://github.com/mikf/gallery-dl/blob/master/gallery_dl/text.py#L42C1-L50C1
+    """
     Convert a string to a URL slug
 
+    # https://github.com/mikf/gallery-dl/blob/master/gallery_dl/text.py#L42C1-L50C1
     Adapted from:
     https://github.com/django/django/blob/master/django/utils/text.py
     """
@@ -212,5 +134,5 @@ def load_config(config_path: str = None) -> dict:
 
 
 @staticmethod
-def json_compact(obj):
+def json_compact(obj) -> dict:
     return json.dumps(obj, separators=(",", ":"), sort_keys=True)

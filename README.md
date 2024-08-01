@@ -2,9 +2,10 @@
 Python library to call the APIs that the store itself calls.  
 To get good parsed results from those API calls see `parser.py`.  
 
-![GitHub Issues or Pull Requests](https://shields.sp-codes.de/github/issues/allendema/rewe_dl)
-![Python Version from PEP 621 TOML](https://shields.sp-codes.de/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fallendema%2Frewe_dl%2Fmain%2Fpyproject.toml)
-![Formatter](https://shields.sp-codes.de/badge/formatter-ruff-blue)
+[![Python Version from PEP 621 TOML](https://shields.sp-codes.de/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fallendema%2Frewe_dl%2Fmain%2Fpyproject.toml)](https://github.com/allendema/rewe_dl/main/pyproject.toml)
+[![Formatter](https://shields.sp-codes.de/badge/formatter-ruff-blue)](https://github.com/astral-sh/ruff)
+[![GitHub Issues or Pull Requests](https://shields.sp-codes.de/github/issues/allendema/rewe_dl)](https://github.com/allendema/rewe_dl/issues)
+[![github commits](https://shields.sp-codes.de/github/last-commit/allendema/rewe_dl)](https://github.com/allendema/rewe_dl/commits/main)
 
 ## Usage
 ```bash
@@ -39,18 +40,7 @@ You can:
 
 <details>
     <summary>examples/discounted_to_sql.py</summary>
-    ```python  
-        def main():
-            discounted_products = STORE().get_discounted_products()
-
-            all_products = Parser().parse_search_results_products(discounted_products)
-
-            this_file = Path(__file__).stem
-            todays_date = datetime.today().strftime("%Y-%m-%d")
-
-            file_name = f"{this_file}-{todays_date}.sqlite3"
-
-            SqlPP.save_to_sql(all_products, file_name)
+    ```python
     ```
 </details>
 

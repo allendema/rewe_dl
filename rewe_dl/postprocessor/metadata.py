@@ -5,10 +5,16 @@ from __future__ import annotations
 import os
 import sys
 import json
+import types
+import logging
 from pathlib import Path
 
+from postprocessor.common import PostProcessor
 
-class MetadataPP:
+log = logging.getLogger(__name__)
+
+
+class MetadataPP(PostProcessor):
     """stripped down and modified from gallery-dl"""
 
     def __init__(self, kwdict, options):
@@ -40,14 +46,18 @@ class MetadataPP:
             self.directory.mkdir(parents=True, exist_ok=True)
 
         if self.filename:
-            self.filename = Path(self.filename).resolve().absolute()
+            # avoid using '.resolve().absolute()' here - wrong 'join' in '_run()'
             if self.filename and not self.directory:
                 self.directory = os.path.dirname(self.filename)
                 os.makedirs(self.directory, exist_ok=True)
 
-    def json_default(obj):
-        if isinstance(obj, None):
+    def json_default(self, obj):
+        if isinstance(obj, types.NoneType):
             return None
+
+        if isinstance(obj, types.GeneratorType):
+            return list(obj)
+
         return str(obj)
 
     def _make_encoder(self):
@@ -66,12 +76,14 @@ class MetadataPP:
     def _write_json(self, fp, kwdict):
         fp.write(self._json_encode(kwdict) + "\n")
 
-    def _run_file(self, kwdict):
-        path = Path(self.directory, self.filename)
+    def _run(self, kwdict):
+        path = Path(self.directory) / self.filename
         path.parent.mkdir(parents=True, exist_ok=True)
 
         with open(path, self.open_mode, encoding=self.encoding) as fp:
             self.writer(fp, kwdict)
 
+        log.info(f"Wrote to file: {path}")
+
     def run(self):
-        return self._run_file(self.kwdict)
+        return self._run(self.kwdict)

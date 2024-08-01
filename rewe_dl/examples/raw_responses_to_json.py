@@ -25,16 +25,22 @@ log = logging.getLogger(__name__)
 
 def main():
     my_store = STORE(store_id="8534540")
-
-    discounted_products = my_store.get_discounted_products()
-
-    all_products = Parser().parse_search_results_products(discounted_products)
+    query = "ja"
 
     todays_date = datetime.today().strftime("%Y-%m-%d")
     this_file = Path(__file__).stem
 
-    options = {"directory": DATA_FOLDER, "filename": f"{this_file}-{todays_date}.json", "mode": "json"}
-    MetadataPP(all_products, options=options).run()
+    paginated = list(my_store.search(query, max_page=1))
+
+    for page, response in enumerate(paginated, 1):
+        options = {
+            "directory": DATA_FOLDER,
+            "filename": f"{this_file}-{query}-{page:02}-{todays_date}.json",
+            "mode": "json",
+            "ident": 4,
+        }
+
+        MetadataPP(response, options=options).run()
 
 
 if __name__ == "__main__":

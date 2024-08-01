@@ -1,2 +1,3 @@
 httpx
-# apprise is options - used for notifications
+apprise
+# apprise is optional

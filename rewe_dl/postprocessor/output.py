@@ -22,6 +22,7 @@ OUT_DIR = PROJECT_ROOT + "/data/"
 class JsonPP(PostProcessor):
     def __init__(self, md_list, options):
         PostProcessor.__init__(self, md_list, options)
+        self.log.warning("USE metadata.MetadataPP!")
 
     @staticmethod
     def to_json(md: dict = None, file_name: str = None):
