@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 
 class SqlPP(PostProcessor):
     def __init__(self, md_list, options):
+        """ Do not use this for very important stuff """
         PostProcessor.__init__(self, md_list)
 
     @staticmethod
@@ -32,7 +33,7 @@ class SqlPP(PostProcessor):
         connector = sqlite3.connect(databank_file, timeout=10, check_same_thread=False)
         cursor = connector.cursor()
 
-        sql_anweisung = """
+        sql_query = """
         CREATE TABLE IF NOT EXISTS deals  (
         store TEXT,
         product TEXT,
@@ -49,7 +50,7 @@ class SqlPP(PostProcessor):
         WITHOUT ROWID;
         """
 
-        cursor.execute(sql_anweisung)
+        cursor.execute(sql_query)
 
         time = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
 

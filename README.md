@@ -1,6 +1,6 @@
 ## About
 Python library to call the APIs that the store itself calls.  
-To get good parsed results from those API calls see `parser.py`.  
+To get good parsed results from those API calls see [`parser.py`](https://github.com/allendema/rewe_dl/blob/main/rewe_dl/parser.py).  
 
 [![Python Version from PEP 621 TOML](https://shields.sp-codes.de/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fallendema%2Frewe_dl%2Fmain%2Fpyproject.toml)](https://github.com/allendema/rewe_dl/main/pyproject.toml)
 [![Formatter](https://shields.sp-codes.de/badge/formatter-ruff-blue)](https://github.com/astral-sh/ruff)
@@ -20,7 +20,7 @@ pip install -e rewe_dl
 
 Optional [apprise](https://github.com/caronc/apprise/wiki/) can be used to send send notifications to more than 100 services/apps.
 
-See [Config](##config) options!
+See [Config](https://github.com/allendema/rewe_dl/main/README.md#config) options!
 
 
 ## Examples
@@ -39,9 +39,33 @@ You can:
 
 
 <details>
+    <summary>examples/discounted_to_json.py</summary>
+    https://github.com/allendema/rewe_dl/blob/7948de8ebc401af4791cdd66fd928daac58d749e/rewe_dl/examples/discounted_to_json.py#L26-L37
+</details>
+
+<details>
     <summary>examples/discounted_to_sql.py</summary>
-    ```python
-    ```
+    https://github.com/allendema/rewe_dl/blob/7948de8ebc401af4791cdd66fd928daac58d749e/rewe_dl/examples/discounted_to_sql.py#L23-L35
+</details>
+
+<details>
+    <summary>examples/my_basket.py</summary>
+    https://github.com/allendema/rewe_dl/blob/7948de8ebc401af4791cdd66fd928daac58d749e/rewe_dl/examples/my_basket.py#L23-L37
+</details>
+
+<details>
+    <summary>examples/newest_products_to_sql.py</summary>
+    https://github.com/allendema/rewe_dl/blob/7948de8ebc401af4791cdd66fd928daac58d749e/rewe_dl/examples/newest_products_to_sql.py#L19-L26
+</details>
+
+<details>
+    <summary>examples/notify_when_price.py</summary>
+    https://github.com/allendema/rewe_dl/blob/7948de8ebc401af4791cdd66fd928daac58d749e/rewe_dl/examples/notify_when_price.py#L54-L66
+</details>
+
+<details>
+    <summary>examples/raw_responses_to_json.py</summary>
+    https://github.com/allendema/rewe_dl/blob/7948de8ebc401af4791cdd66fd928daac58d749e/rewe_dl/examples/raw_responses_to_json.py#L26-L43
 </details>
 
 

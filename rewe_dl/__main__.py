@@ -18,5 +18,7 @@ if not __package__ and not hasattr(sys, "frozen"):
 
 import rewe
 
+"""
 if __name__ == "__main__":
     raise SystemExit(rewe.main())
+"""
