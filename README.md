@@ -4,10 +4,17 @@ To get good parsed results from those API calls see [`parser.py`](https://github
 
 [![Python Version from PEP 621 TOML](https://shields.sp-codes.de/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fallendema%2Frewe_dl%2Fmain%2Fpyproject.toml)](https://github.com/allendema/rewe_dl/main/pyproject.toml)
 [![Formatter](https://shields.sp-codes.de/badge/formatter-ruff-blue)](https://github.com/astral-sh/ruff)
-[![GitHub Issues or Pull Requests](https://shields.sp-codes.de/github/issues/allendema/rewe_dl)](https://github.com/allendema/rewe_dl/issues)
 [![github commits](https://shields.sp-codes.de/github/last-commit/allendema/rewe_dl)](https://github.com/allendema/rewe_dl/commits/main)
 
 ## Usage
+<details>
+    <summary>Prequisites</summary>
+
+    sudo apt-get install git
+    python -m ensurepip --upgrade
+
+</details>
+
 ```bash
 git clone https://github.com/allendema/rewe_dl && cd rewe_dl
 ```  
@@ -35,7 +42,6 @@ You can:
   - save products to SQL for further analysis
   - analyse the output data the way you like, for example: inflation analysis.
   - _and_ whatever you want.
-
 
 
 <details>
@@ -82,6 +88,7 @@ and select your pickup store.
 Right click -> Inspect source -> Web Storage -> Cookies  
 and copy the value from `marketsCookie` into the `config.json` file.
 
+
 ### Notifications/Webhooks
 If you don't want to install apprise, you can use [matrix.org](https://matrix.org) or [telegram.org](https://telegram.org).  
 
@@ -120,4 +127,3 @@ If you want to modify something:
 ## Credits
 Inspired from [gallery-dl](https://github.com/mikf/gallery-dl), the code structure is similiar and some is code straight reused.  
 Where applicable - docstrings point to original code creators.
-

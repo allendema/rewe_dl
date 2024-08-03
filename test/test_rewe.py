@@ -124,7 +124,6 @@ class TestSTORE(CustomTestCase):
                 result.get("type").lower(),
                 ("search_result", "corrected_term"),
             )
-            self.assertTrue(result.get("type").lower() in ("search_result", "corrected_term"))
 
     def test_search_max_page(self):
         paginated = self.store.search(search_term="ja", max_page=2)

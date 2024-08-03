@@ -63,6 +63,8 @@ class MdBaseTest(unittest.TestCase):
         cls.dir = tempfile.TemporaryDirectory()
         _number_json, cls.temp_file_json = tempfile.mkstemp(suffix=".json")
         _number_jsonl, cls.temp_file_jsonl = tempfile.mkstemp(suffix=".jsonl")
+        _, cls.temp_file_custom_format = tempfile.mkstemp(prefix="custom_format", suffix=".txt")
+        __, cls.temp_file_custom_filename = tempfile.mkstemp(prefix="custom_filename", suffix=".json")
 
     @classmethod
     def tearDownClass(cls):
@@ -96,44 +98,6 @@ class MdBaseTest(unittest.TestCase):
 
 
 class MetadataTest(MdBaseTest):
-    @classmethod
-    def setUpClass(cls):
-        cls.dir = tempfile.TemporaryDirectory()
-        _number_json, cls.temp_file_json = tempfile.mkstemp(suffix=".json")
-        _number_jsonl, cls.temp_file_jsonl = tempfile.mkstemp(suffix=".jsonl")
-        _, cls.temp_file_custom_format = tempfile.mkstemp(prefix="custom_format", suffix=".txt")
-        __, cls.temp_file_custom_filename = tempfile.mkstemp(prefix="custom_filename", suffix=".json")
-
-    @classmethod
-    def tearDownClass(cls):
-        # cls.dir.cleanup()
-        pass
-
-    def example_products():
-        products = []
-        _product_dict = {}
-
-        _product_dict["store"] = PROJECT_NAME
-
-        _product_dict["title"] = "This is product title"
-        _product_dict["link"] = "https://example.org/777333777/product-link"
-
-        _product_dict["product_id"] = "777333777"
-
-        _product_dict["price"] = "20.0"
-        _product_dict["old_price"] = "25.0"
-
-        _product_dict["saved"] = "5.0"
-
-        _product_dict["brand"] = "sOmE bRanD"
-        _product_dict["picture"] = "https://example.org/pic.ext"
-
-        products.append(_product_dict)
-
-        return products
-
-    products = example_products()
-
     def test_metadata_to_json(self):
         options = {
             "filename": self.temp_file_json,
