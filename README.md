@@ -8,7 +8,7 @@ To get good parsed results from those API calls see [`parser.py`](https://github
 
 ## Usage
 <details>
-    <summary>Prequisites</summary>
+    <summary>Prerequisites</summary>
 
     sudo apt-get install git
     python -m ensurepip --upgrade
@@ -80,7 +80,7 @@ See `rewe_dl/examples` folder for some more starting examples to embedd it into 
 
 ## Config
 ### Getting the cookies
-Depending on store location some stores will have different prices.
+Depending on store location, some stores will have different prices.
 
 To not use the default store, go to [https://shop.rewe.de](https://shop.rewe.de)  
 and select your pickup store.
@@ -116,7 +116,7 @@ If you want to modify something:
   - `pip install requirements-dev.txt`
   - The `pyproject.toml` file is used for linting/formatting with `ruff`.
   - Make your changes.
-  - If you add tests run them with `python3 ./scripts/run_tests.py`.
+  - If you add tests, run them with `python3 ./scripts/run_tests.py`.
   - Run `ruff check --fix .`
   - Run `ruff format .`
   - Create a [Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).

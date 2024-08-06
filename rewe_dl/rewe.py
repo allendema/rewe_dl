@@ -360,7 +360,10 @@ class STORE(Config):
         return self.products_by_attribute(param_key="categorySlug", param_value=category_slug, **kwargs)
 
     def search_brand(self, brand_name: str, **kwargs):
-        return self.products_by_attribute(param_key="brand", param_value=brand_name, **kwargs)
+        # with search_brand - when default attribute 'new' is used there are no product results
+        return self.products_by_attribute(
+            attributes=[""], param_key="brand", param_value=brand_name, **kwargs
+        )
 
     def categories(self, search_result: search) -> list[dict]:
         """return categories and subcategories as a flat list of dicts for given 'search_result'"""
@@ -447,7 +450,8 @@ class STORE(Config):
 
     def products_by_attribute(
         self,
-        attributes=["new"],
+        # attributes=["new"],
+        attributes: list[str] = [""],
         param_key: str = "",
         param_value: str = "",
         max_page: int = 1,
@@ -464,7 +468,7 @@ class STORE(Config):
         endpoint = "products"
 
         params = {
-            "objectsPerPage": 80,  # 10, 20, 40, 80
+            "objectsPerPage": 250,  # 10, 20, 40, 80, 250
             "page": 1,
             "search": "*",
             "sorting": "RELEVANCE_DESC",

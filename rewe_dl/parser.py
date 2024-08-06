@@ -165,8 +165,17 @@ class Parser:
 
             parsed = Parser().parse_product_from_offers(products)
 
+            # sort by 'saved' amount - high-to-low
+            parsed = sorted(parsed, key=self._sort_by_saved, reverse=True)
+
             yield from parsed
 
     def parse_search_category(self, search_result: Iterator[dict]):
         """convinience function for better naming"""
         return self.parse_search_results_products(search_result)
+
+    def _sort_by_key(self, item, key: str):
+        return item.get(key, "")
+
+    def _sort_by_saved(self, item):
+        return self._sort_by_key(item, key="saved")
