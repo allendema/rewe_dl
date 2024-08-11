@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+# Copyright 2023-2024 Allen Dema
 from __future__ import annotations
 
 import os
@@ -9,11 +10,14 @@ import atexit
 import logging
 from time import sleep
 from typing import Iterator
+from pathlib import Path
 from functools import lru_cache
 from urllib.parse import urljoin, urlparse, urlencode
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(PROJECT_DIR)
+DATA_FOLDER = os.path.join(PROJECT_ROOT, "data")
+THIS_FILE = Path(__file__).stem
 
 import exception
 from parser import Parser
@@ -22,7 +26,7 @@ from exception import InputFileError
 
 import httpx
 
-log_file = PROJECT_ROOT + "/data/" + os.path.basename(__file__).removesuffix(".py") + ".log"
+log_file = Path(DATA_FOLDER, THIS_FILE + ".log")
 file_handler = logging.FileHandler(filename=log_file)
 stdout_handler = logging.StreamHandler(stream=sys.stdout)
 handlers = [file_handler, stdout_handler]
@@ -421,8 +425,6 @@ class STORE(Config):
         def parse_dict(search_result):
             try:
                 for product in search_result.get("offers"):
-                    log.info(product)
-
                     yield str(product.get("id", ""))
 
             except TypeError:

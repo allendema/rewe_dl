@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Copyright 2023-2024 Allen Dema
+
 from __future__ import annotations
 
 import os

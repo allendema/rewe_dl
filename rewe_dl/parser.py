@@ -146,18 +146,6 @@ class Parser:
         """returns 'products' key from search result"""
         return Parser._from_emebedded(response, "products")
 
-    def _parse_search_results_products(self, products: Iterator) -> list[dict]:
-        """returns product_infos for every product in 'products'"""
-        msg = "Use 'parse_search_results_products' to avoid http requests!"
-        log.warning(msg)
-        # raise DeprecationWarning(msg)
-
-        import STORE
-
-        product_ids = STORE().product_ids(response)
-
-        return STORE().product_infos(product_ids=product_ids)
-
     def parse_search_results_products(self, search_result: Iterator[dict]):
         """returns 'Product' asdict for every product in 'search_result'"""
         for search_results_page in search_result:
