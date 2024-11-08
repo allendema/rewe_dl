@@ -8,8 +8,8 @@ import os
 import sys
 from pathlib import Path
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(PROJECT_DIR))
 
 from rewe import STORE
 from parser import Parser
@@ -23,7 +23,7 @@ def main():
 
     this_file = Path(__file__).stem
 
-    SqlPP.save_to_sql(all_products, file_name=this_file + ".sqlite3")
+    SqlPP.save_to_sql(all_products, file_name=f"{this_file}.sqlite3")
 
 
 if __name__ == "__main__":

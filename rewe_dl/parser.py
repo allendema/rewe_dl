@@ -158,6 +158,12 @@ class Parser:
 
             yield from parsed
 
+    def parse_alternatives(self, search_result: Iterator[dict]):
+        """convinience function for better naming"""
+
+        products = Parser().parse_search_results_products(search_result)
+        return products
+
     def parse_search_category(self, search_result: Iterator[dict]):
         """convinience function for better naming"""
         return self.parse_search_results_products(search_result)

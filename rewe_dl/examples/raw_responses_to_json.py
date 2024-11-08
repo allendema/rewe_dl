@@ -37,7 +37,7 @@ def main():
             "directory": DATA_FOLDER,
             "filename": f"{this_file}-{query}-{page:02}-{todays_date}.json",
             "mode": "json",
-            "ident": 4,
+            "indent": 4,
         }
 
         MetadataPP(response, options=options).run()
