@@ -29,16 +29,14 @@ import httpx
 log_file = Path(DATA_FOLDER, THIS_FILE + ".log")
 file_handler = logging.FileHandler(filename=log_file)
 stdout_handler = logging.StreamHandler(stream=sys.stdout)
-handlers = [file_handler, stdout_handler]
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="[{%(filename)s:%(funcName)s:%(lineno)d}] %(levelname)s - %(message)s",
-    handlers=handlers,
+    handlers=[file_handler, stdout_handler],
 )
 
-log = logging.getLogger(__name__)
-
+log = logging.getLogger("__name__")
 
 @staticmethod
 def set_session(
@@ -99,17 +97,13 @@ class Config:
         sleep_request=1.0,
     ):
         self.name = self.__class__.__name__
-        if not base_url.endswith("/"):
-            base_url = base_url + "/"
 
-        self.BASE_URL = base_url or ""
+        self.BASE_URL = urljoin(base_url, "/")
         self.BASE_API_ENDPOINT = "api"
-        self.SLEEP_REQUEST = float(sleep_request)
-
         self.STORE_ID = str(store_id)
 
-        if not globals().get("session"):
-            self.load()
+        self.SLEEP_REQUEST = float(sleep_request)
+
 
     def from_file(self, file_path: str = None) -> dict:
         """return a dict from 'file_path' if it exists or raise an exception"""
@@ -189,12 +183,7 @@ class Config:
             cookies = self.from_web()
         except Exception as e:
             log.error(e)
-            # raise InputFileError("Could not cookies from_web!")
-        finally:
-            if cookies or cookies == {}:
-                if not globals().get("session"):
-                    set_session(default_headers=create_agents(), default_cookies=cookies)
-
+            raise InputFileError("Could not get cookies from_web!")
         return cookies
 
     @staticmethod
@@ -220,6 +209,18 @@ class Config:
 
         return ret_dict
 
+    def _ensure_session(self):
+        if not globals().get("session"):
+            try:
+                from utils import create_agents
+
+                log.debug("globals() session is none. Loading...")
+                self.cookies = self.load()
+
+                set_session(None, deafult_headers=create_agents(), default_cookies=self.cookies)
+            except Exception as e:
+                raise e
+
 
 class STORE(Config):
     def __repr__(self):
@@ -230,6 +231,8 @@ class STORE(Config):
         so that self.STORE_ID, self.SLEEP_REQUEST etc will be set/re-set
         """
         super().__init__(*args, **kwargs)
+        self._ensure_session()
+
 
     def call(
         self,
@@ -243,23 +246,33 @@ class STORE(Config):
         """any **kwargs will be passed to the http request"""
         if not base_url:
             base_url = self.BASE_URL
-        if not base_url.endswith("/"):
-            base_url = base_url + "/"
         if not base_api_endpoint:
             base_api_endpoint = ""
+        base_url = urljoin(base_url, "/")
+
 
         sleep(self.SLEEP_REQUEST)
 
+        session = globals().get("session")
+        if not session or not method.lower() in dir(session):
+            log.error("session not pre set")
+            raise AttributeError
+
         if method.lower() in dir(session):
             session_method = getattr(session, method.lower())
-        else:
-            raise AttributeError
+
+            if not session_method:
+                log.error("no session_method")
+                return
 
         url = urljoin(base_url, base_api_endpoint + endpoint + "?")
 
-        r = session_method(url, params=urlencode(params, safe=", !"), **kwargs)
+        response = session_method(url, params=urlencode(params, safe=", !"), **kwargs)
 
-        return r.json()
+        try:
+            return response.json()
+        except Exception as e:
+            raise e
 
     @staticmethod
     def paginate(
@@ -278,6 +291,7 @@ class STORE(Config):
         if not isinstance(params, dict):
             raise AttributeError
 
+        session = globals().get("session")
         if method.lower() in dir(session):
             session_method = getattr(session, method.lower())
         else:
@@ -534,21 +548,23 @@ class STORE(Config):
 
     def recommendations(self, product_ids: list[str]) -> dict:
         """returns a dict containing product listingsIds - to be used in 'product_infos'"""
-        """ https://shop.rewe.de/reco/recommendations?context=product-details-recommendations&productIds=3231481 """
+        """https://shop.rewe.de/reco/recommendations?context=product-details-recommendations&productIds=3231481"""
         base_url = "https://shop.rewe.de/"
-        endpoint = "reco/recommendations?"
+        endpoint = "reco/recommendations"
 
         params = {
             "context": "product-details-recommendations",
             "productIds": ",".join(product_ids),
         }
 
-        url = base_url + endpoint + urlencode(params)
+        response = self.call(
+            base_url=base_url,
+            base_api_endpoint="",
+            endpoint=endpoint,
+            params=params,
+        )
 
-        global session
-        r = session.get(url).json()
-
-        return r
+        return response.json()
 
     @lru_cache
     def suggestions(self, search_term: str) -> dict:
@@ -560,14 +576,14 @@ class STORE(Config):
 
         params = {"q": search_term}
 
-        r = self.call(
+        response = self.call(
             base_url=base_url,
             base_api_endpoint="api/",
             endpoint=endpoint,
             params=params,
         )
 
-        return r
+        return response
 
     def get_listings_ids(
         self,
@@ -610,10 +626,8 @@ class STORE(Config):
 
     def _get_alternatives(self, search_results: search) -> Iterator[list]:
         """get alt products (in the same category?) from search result"""
-        result = self._yield_from_key(search_results, key="alternatives")
-
-        products = Parser().parse_search_results_products(result)
-        return products
+        yield from self._yield_from_key(search_results, key="alternatives")
+        # return list(self._yield_from_key(search_results, key="alternatives"))
 
 
 class Basket:
@@ -633,7 +647,7 @@ class Basket:
         for listing_id in listings_ids:
             sleep(self.STORE.SLEEP_REQUEST)
 
-            endpoint = "baskets/listings/{listing_id}"
+            endpoint = f"baskets/listings/{listing_id}"
 
             payload = {
                 "context": "product-details-recommendations",
@@ -643,9 +657,9 @@ class Basket:
 
             url = f"{base_url}/api/{endpoint}"
 
-            r = httpx.post(url, data=payload, cookies=cookies)
+            response = httpx.post(url, data=payload, cookies=cookies)
 
-            yield r
+            yield response
 
         return None
 
@@ -735,7 +749,7 @@ class Cli(Config):
         category_slugs = [self.id_from_url(url) for url in urls]
 
         for category_slug in category_slugs:
-            search_result = STORE().search_category(category_slug, max_page=max_page)
+            search_result = self.STORE.search_category(category_slug, max_page=max_page)
 
             product_mds = Parser().parse_search_category(search_result)
 
