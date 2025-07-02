@@ -1,14 +1,14 @@
 [project]
+name = "rewe_dl"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 license = {file = "LICENSE"}
 keywords = ["httpx", "api", "api-client", "products", "price-tracker", "inflation", "price"]
 authors = [
-  {email = ""},
   {name = "Allen Dema"}
 ]
 maintainers = [
-  {name = "Allen Dema", email = ""}
+  {name = "Allen Dema"}
 ]
 
 [project.urls]
@@ -21,6 +21,11 @@ changelog = "https://github.com/allendema/rewe_dl/blob/main/CHANGELOG.md"
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools.dynamic]
+version = { attr = "project_name.version.__version__" }
+readme = {file = ["README.md"]}
 
 [tool.black]
 count = false
