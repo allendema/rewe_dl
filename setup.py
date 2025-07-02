@@ -17,7 +17,7 @@ PROJECT_NAME = "rewe_dl"
 # get version without importing the package
 VERSION = re.search(
     r'__version__\s*=\s*"([^"]+)"',
-    read("../version.py"),
+    read(f"{PROJECT_NAME}/version.py"),
 ).group(1)
 
 
@@ -50,7 +50,7 @@ def build_setuptools():
         maintainer="Allen Dema",
         maintainer_email="",
         license="",
-        python_requires=">=3.6",
+        python_requires=">=3.8",
         install_requires=[
             "httpx",
         ],
@@ -66,9 +66,6 @@ def build_setuptools():
             "Programming Language :: Python",
             "Programming Language :: Python :: 3",
             "Programming Language :: Python :: 3 :: Only",
-            "Programming Language :: Python :: 3.5",
-            "Programming Language :: Python :: 3.6",
-            "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
