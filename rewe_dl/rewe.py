@@ -142,13 +142,13 @@ class Config:
 
         config = r.cookies
 
-        if not config.get("marketsCookie"):
-            msg = "marketsCookie not in api response!"
+        if not config.get("wksMarketsCookie"):
+            msg = "wksMarketsCookie not in api response!"
         return dict(config)
 
     def user_data_from_web(self) -> dict:
         """get currect userdata from api"""
-        # 'marketsCookie' cookie must be set in config.json
+        # 'wksMarketsCookie' cookie must be set in config.json
         raise NotImplementedError
 
         base_url = "https://www.rewe.de"
@@ -191,7 +191,7 @@ class Config:
 
         ret_dict = {}
         for cookie_name, cookie_value in cookies_from_config_file.items():
-            if cookie_name == "marketsCookie":
+            if cookie_name == "wksMarketsCookie":
                 # this cookie value must be compact json and THEN urlencoded
                 unwanted_key = "not_needed"
 
