@@ -38,6 +38,7 @@ logging.basicConfig(
 
 log = logging.getLogger("__name__")
 
+
 @staticmethod
 def set_session(
     current_session: httpx.Client = None,
@@ -66,12 +67,11 @@ def set_session(
     """
 
     if not current_session:
-        default = httpx.Client(headers=default_headers, cookies=default_cookies)
+        default = httpx.Client(headers=default_headers, cookies=default_cookies, follow_redirects=True)
         current_session = default
 
     else:
         current_session.headers.update(**kwargs.get("headers", {}))
-        current_session.cookies.update(**kwargs.get("cookies", {}))
 
     globals()["session"] = current_session
 
@@ -92,18 +92,17 @@ class Config:
     def __init__(
         self,
         base_url="https://www.rewe.de/",
-        # ONLY store_id's on shop.rewe.de
+        # ONLY store_id's on www.rewe.de/shop
         store_id="8534540",
         sleep_request=1.0,
     ):
         self.name = self.__class__.__name__
 
         self.BASE_URL = urljoin(base_url, "/")
-        self.BASE_API_ENDPOINT = "api"
+        self.BASE_API_ENDPOINT = "shop/api"
         self.STORE_ID = str(store_id)
 
         self.SLEEP_REQUEST = float(sleep_request)
-
 
     def from_file(self, file_path: str = None) -> dict:
         """return a dict from 'file_path' if it exists or raise an exception"""
@@ -128,9 +127,9 @@ class Config:
         if not self.STORE_ID:
             return
 
-        base_url = "https://shop.rewe.de"
+        base_url = "https://www.rewe.de"
         base_api_endpoint = "api/"
-        endpoint = "marketselection/userselections"
+        endpoint = "wksmarketsearch/configuration"
 
         payload = {
             "selectedService": "PICKUP",
@@ -143,18 +142,16 @@ class Config:
 
         config = r.cookies
 
-        if not config.get("marketsCookie"):
-            msg = "marketsCookie not in api response!"
-            raise ValueError(msg)
-
+        if not config.get("wksMarketsCookie"):
+            msg = "wksMarketsCookie not in api response!"
         return dict(config)
 
     def user_data_from_web(self) -> dict:
         """get currect userdata from api"""
-        # 'marketsCookie' cookie must be set in config.json
+        # 'wksMarketsCookie' cookie must be set in config.json
         raise NotImplementedError
 
-        base_url = "https://shop.rewe.de"
+        base_url = "https://www.rewe.de"
         base_api_endpoint = ""
         endpoint = "content-homepage-backend/userdata"
         cookies = self.from_web()
@@ -173,7 +170,6 @@ class Config:
 
     def load(self) -> dict:
         """load cookies from_file - else get online info"""
-        from utils import create_agents
 
         cookies = {}
         try:
@@ -195,7 +191,7 @@ class Config:
 
         ret_dict = {}
         for cookie_name, cookie_value in cookies_from_config_file.items():
-            if cookie_name == "marketsCookie":
+            if cookie_name == "wksMarketsCookie":
                 # this cookie value must be compact json and THEN urlencoded
                 unwanted_key = "not_needed"
 
@@ -204,7 +200,7 @@ class Config:
 
             ret_dict[cookie_name] = cookie_value
 
-            # cookies.set(cookie_name, cookie_value, domain='shop.rewe.de')
+            # cookies.set(cookie_name, cookie_value, domain='www.rewe.de')
             # cookies.set(cookie_name, cookie_value, domain='rewe.de')
 
         return ret_dict
@@ -233,11 +229,10 @@ class STORE(Config):
         super().__init__(*args, **kwargs)
         self._ensure_session()
 
-
     def call(
         self,
         base_url: str = None,
-        base_api_endpoint: str = "api/",
+        base_api_endpoint: str = "shop/api/",
         endpoint: str = None,
         params: dict = {},
         method: str = "get",
@@ -249,7 +244,6 @@ class STORE(Config):
         if not base_api_endpoint:
             base_api_endpoint = ""
         base_url = urljoin(base_url, "/")
-
 
         sleep(self.SLEEP_REQUEST)
 
@@ -298,10 +292,8 @@ class STORE(Config):
             raise AttributeError
 
         sleep(0.3)
-
         while params.get(page_key) <= max_page:
             r = session_method(url, params=params, **kwargs)
-
             if r.status_code in (200, 206):
                 data = r.json()
                 yield data
@@ -330,13 +322,13 @@ class STORE(Config):
         given '*_ids' in one request'
         At least one of listingIds, productIds or articleIds must be set!
 
-        source of info: 'https://shop.rewe.de/api/product-tiles?'
-        https://shop.rewe.de/api/product-tiles?listingIds=8-P54WB8A8-4e6503bb-5212-3dd3-8a1b-7d0b57d7627f&context=tile&serviceTypes=PICKUP
-        https://shop.rewe.de/api/product-tiles?productIds=2621809
+        source of info: 'https://www.rewe.de/shop/api/product-tiles?'
+        https://www.rewe.de/shop/api/product-tiles?listingIds=8-P54WB8A8-4e6503bb-5212-3dd3-8a1b-7d0b57d7627f&context=tile&serviceTypes=PICKUP
+        https://www.rewe.de/shop/api/product-tiles?productIds=2621809
         """
 
-        base_url = "https://shop.rewe.de/"
-        base_api_endpoint = "api/"
+        base_url = "https://www.rewe.de/"
+        base_api_endpoint = "shop/api/"
         endpoint = "product-tiles"
 
         params = {
@@ -363,12 +355,12 @@ class STORE(Config):
         returns an Iterator of dicts"""
         assert search_term is not None, "search_term must not be None"
 
-        base_url = "https://shop.rewe.de"
+        base_url = "https://www.rewe.de"
         endpoint = "products"
 
         params = {"search": search_term, "market": self.STORE_ID, "page": 1}
 
-        url = f"{base_url}/api/{endpoint}?"
+        url = f"{base_url}/shop/api/{endpoint}?"
 
         return self.paginate(url, params, page_key="page", max_page=max_page)
 
@@ -476,11 +468,11 @@ class STORE(Config):
         and/or 'param_key="filter"' and param_value="nothing"
         until 'max_page' is reached.
 
-        # front end -> https://shop.rewe.de/productList?attribute=lactosefree&attribute=glutenfree
-        # https://shop.rewe.de/api/products?attribute=new&objectsPerPage=40&page=1&search=*&sorting=RELEVANCE_DESC&serviceTypes=PICKUP&market=1940419&debug=false&autocorrect=true
+        # front end -> https://www.rewe.de/shop/productList?attribute=lactosefree&attribute=glutenfree
+        # https://www.rewe.de/shop/api/products?attribute=new&objectsPerPage=40&page=1&search=*&sorting=RELEVANCE_DESC&serviceTypes=PICKUP&market=1940419&debug=false&autocorrect=true
         """
 
-        base_url = "https://shop.rewe.de"
+        base_url = "https://www.rewe.de"
         endpoint = "products"
 
         params = {
@@ -501,7 +493,7 @@ class STORE(Config):
         # combine multiple atrributes like attribute=new&attribute=discounted
         params["attribute"] = "&attribute=".join(attributes)
 
-        url = f"{base_url}/api/{endpoint}"
+        url = f"{base_url}/shop/api/{endpoint}"
 
         return self.paginate(url, params, page_key="page", max_page=max_page)
 
@@ -548,8 +540,8 @@ class STORE(Config):
 
     def recommendations(self, product_ids: list[str]) -> dict:
         """returns a dict containing product listingsIds - to be used in 'product_infos'"""
-        """https://shop.rewe.de/reco/recommendations?context=product-details-recommendations&productIds=3231481"""
-        base_url = "https://shop.rewe.de/"
+        """https://www.rewe.de/shop/reco/recommendations?context=product-details-recommendations&productIds=3231481"""
+        base_url = "https://www.rewe.de/"
         endpoint = "reco/recommendations"
 
         params = {
@@ -559,7 +551,7 @@ class STORE(Config):
 
         response = self.call(
             base_url=base_url,
-            base_api_endpoint="",
+            base_api_endpoint="shop/",
             endpoint=endpoint,
             params=params,
         )
@@ -569,16 +561,16 @@ class STORE(Config):
     @lru_cache
     def suggestions(self, search_term: str) -> dict:
         """returns a dict containing product infos like listingsIds - to be used in 'product_infos'"""
-        """ https://shop.rewe.de/api/suggestions?q=TUC """
+        """https://www.rewe.de/shop/api/suggestions?q=TUC"""
 
-        base_url = "https://shop.rewe.de"
+        base_url = "https://www.rewe.de"
         endpoint = "/suggestions"
 
         params = {"q": search_term}
 
         response = self.call(
             base_url=base_url,
-            base_api_endpoint="api/",
+            base_api_endpoint="shop/api/",
             endpoint=endpoint,
             params=params,
         )
@@ -639,9 +631,9 @@ class Basket:
 
     def add(self, listings_ids: list[str], quantity: int = 1) -> Iterator[httpx.Response] | None:
         """Add something to basket"""
-        """https://shop.rewe.de/api/baskets/listings/13-4001686301524-4e6503bb-5212-3dd3-8a1b-7d0b57d7627f"""
+        """https://www.rewe.de/shop/api/baskets/listings/13-4001686301524-4e6503bb-5212-3dd3-8a1b-7d0b57d7627f"""
 
-        base_url = "https://shop.rewe.de"
+        base_url = "https://www.rewe.de/shop"
         cookies = Config.load()
 
         for listing_id in listings_ids:
@@ -674,10 +666,10 @@ class Branch:
     @lru_cache()
     def in_zipcode(self, zipcode: str) -> dict:
         """Returns a dict of all branches around 'zipcode' that have pickup"""
-        """https://shop.rewe.de/api/marketselection/zipcodes/56073/services/pickup"""
+        """https://www.rewe.de/shop/api/marketselection/zipcodes/56073/services/pickup"""
 
-        base_url = "https://shop.rewe.de"
-        endpoint = f"marketselection/zipcodes/{zipcode}/services/pickup"
+        base_url = "https://www.rewe.de"
+        endpoint = f"/shop/marketselection/zipcodes/{zipcode}/services/pickup"
 
         r = self.call(base_url, endpoint=endpoint)
 
@@ -690,7 +682,7 @@ class Branch:
     @lru_cache()
     def first_in_zipcode(self, zipcode: str) -> dict | None:
         """Get first branch that has pickup in 'zipcode'"""
-        """https://shop.rewe.de/api/marketselection/zipcodes/56073/services/pickup"""
+        """https://www.rewe.de/shop/api/marketselection/zipcodes/56073/services/pickup"""
 
         data = self.in_zipcode(zipcode).json()
 
