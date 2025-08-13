@@ -92,7 +92,7 @@ class Config:
     def __init__(
         self,
         base_url="https://www.rewe.de/",
-        # ONLY store_id's on shop.rewe.de
+        # ONLY store_id's on www.rewe.de/shop
         store_id="8534540",
         sleep_request=1.0,
     ):
@@ -200,7 +200,7 @@ class Config:
 
             ret_dict[cookie_name] = cookie_value
 
-            # cookies.set(cookie_name, cookie_value, domain='shop.rewe.de')
+            # cookies.set(cookie_name, cookie_value, domain='www.rewe.de')
             # cookies.set(cookie_name, cookie_value, domain='rewe.de')
 
         return ret_dict
@@ -322,9 +322,9 @@ class STORE(Config):
         given '*_ids' in one request'
         At least one of listingIds, productIds or articleIds must be set!
 
-        source of info: 'https://shop.rewe.de/api/product-tiles?'
-        https://shop.rewe.de/api/product-tiles?listingIds=8-P54WB8A8-4e6503bb-5212-3dd3-8a1b-7d0b57d7627f&context=tile&serviceTypes=PICKUP
-        https://shop.rewe.de/api/product-tiles?productIds=2621809
+        source of info: 'https://www.rewe.de/shop/api/product-tiles?'
+        https://www.rewe.de/shop/api/product-tiles?listingIds=8-P54WB8A8-4e6503bb-5212-3dd3-8a1b-7d0b57d7627f&context=tile&serviceTypes=PICKUP
+        https://www.rewe.de/shop/api/product-tiles?productIds=2621809
         """
 
         base_url = "https://www.rewe.de/"
@@ -468,8 +468,8 @@ class STORE(Config):
         and/or 'param_key="filter"' and param_value="nothing"
         until 'max_page' is reached.
 
-        # front end -> https://shop.rewe.de/productList?attribute=lactosefree&attribute=glutenfree
-        # https://shop.rewe.de/api/products?attribute=new&objectsPerPage=40&page=1&search=*&sorting=RELEVANCE_DESC&serviceTypes=PICKUP&market=1940419&debug=false&autocorrect=true
+        # front end -> https://www.rewe.de/shop/productList?attribute=lactosefree&attribute=glutenfree
+        # https://www.rewe.de/shop/api/products?attribute=new&objectsPerPage=40&page=1&search=*&sorting=RELEVANCE_DESC&serviceTypes=PICKUP&market=1940419&debug=false&autocorrect=true
         """
 
         base_url = "https://www.rewe.de"
@@ -631,9 +631,9 @@ class Basket:
 
     def add(self, listings_ids: list[str], quantity: int = 1) -> Iterator[httpx.Response] | None:
         """Add something to basket"""
-        """https://shop.rewe.de/api/baskets/listings/13-4001686301524-4e6503bb-5212-3dd3-8a1b-7d0b57d7627f"""
+        """https://www.rewe.de/shop/api/baskets/listings/13-4001686301524-4e6503bb-5212-3dd3-8a1b-7d0b57d7627f"""
 
-        base_url = "https://shop.rewe.de"
+        base_url = "https://www.rewe.de/shop"
         cookies = Config.load()
 
         for listing_id in listings_ids:
@@ -666,10 +666,10 @@ class Branch:
     @lru_cache()
     def in_zipcode(self, zipcode: str) -> dict:
         """Returns a dict of all branches around 'zipcode' that have pickup"""
-        """https://shop.rewe.de/api/marketselection/zipcodes/56073/services/pickup"""
+        """https://www.rewe.de/shop/api/marketselection/zipcodes/56073/services/pickup"""
 
-        base_url = "https://shop.rewe.de"
-        endpoint = f"marketselection/zipcodes/{zipcode}/services/pickup"
+        base_url = "https://www.rewe.de"
+        endpoint = f"/shop/marketselection/zipcodes/{zipcode}/services/pickup"
 
         r = self.call(base_url, endpoint=endpoint)
 
@@ -682,7 +682,7 @@ class Branch:
     @lru_cache()
     def first_in_zipcode(self, zipcode: str) -> dict | None:
         """Get first branch that has pickup in 'zipcode'"""
-        """https://shop.rewe.de/api/marketselection/zipcodes/56073/services/pickup"""
+        """https://www.rewe.de/shop/api/marketselection/zipcodes/56073/services/pickup"""
 
         data = self.in_zipcode(zipcode).json()
 
