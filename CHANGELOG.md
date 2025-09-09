@@ -1,3 +1,6 @@
+# 2025-09-09
+[project] NOTE: THIS CODE WILL SOON BE PART OF ANOTHER PROJECT - AND SO IT WILL BE MOVED INTO ANOTHER REPOSITORY.
+
 # 2025-08-12
 [utils] update user agents.
 [store] update from shop.rewe.de subdomain to www.rewe.de/shop subpath.

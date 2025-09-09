@@ -2,6 +2,8 @@
 Python library to call the APIs that the store itself calls.  
 To get good parsed results from those API calls see [`parser.py`](https://github.com/allendema/rewe_dl/blob/main/rewe_dl/parser.py).  
 
+*NOTE: THIS CODE WILL SOON BE PART OF ANOTHER PROJECT - AND SO IT WILL MOVED INTO ANOTHER REPOSITORY.*
+
 [![Python Version from PEP 621 TOML](https://shields.sp-codes.de/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fallendema%2Frewe_dl%2Fmain%2Fpyproject.toml)](https://github.com/allendema/rewe_dl/main/pyproject.toml)
 [![Formatter](https://shields.sp-codes.de/badge/formatter-ruff-blue)](https://github.com/astral-sh/ruff)
 [![github commits](https://shields.sp-codes.de/github/last-commit/allendema/rewe_dl)](https://github.com/allendema/rewe_dl/commits/main)
